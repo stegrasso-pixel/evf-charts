@@ -1,10 +1,10 @@
 /*!
- * EVF Charts of the Month | chart engine | version 1.5.1 | 22 September 2026
+ * EVF Charts of the Month | chart engine | version 1.6.0 | 22 September 2026
  * The EVF chart page loads this file from jsDelivr at a pinned version. The page holds only the CONFIG settings.
  * Never edit a released version. Publish every change as a new file with a new release tag.
  */
 (function () {
-const VERSION = '1.5.1';
+const VERSION = '1.6.0';
 const SELF = (document.currentScript && document.currentScript.src) || '';
 const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Barlow:wght@600;700;800&family=Inter+Tight:wght@400;500;600&display=swap';
 const CSS = ':root { --navy: #15263B; --navy-mid: #0C4B76; --cyan: #1DB4D7; --white: #FFFFFF; --steel: #5C768C; --grey: #707070;\n    --red: #E05555; --muted: rgba(255,255,255,0.72); --faint: rgba(255,255,255,0.60); }\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  body { background: #FFFFFF; font-family: \'Inter Tight\', \'Inter\', sans-serif; padding: 16px; }\n  #toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }\n  #toolbar button, #paste-panel button { font-family: \'Barlow\', sans-serif; font-weight: 700; font-size: 14px; letter-spacing: .08em;\n    text-transform: uppercase; color: var(--cyan); background: var(--navy); border: 0; border-radius: 0; padding: 10px 16px; cursor: pointer; }\n  #qa { font-size: 13px; line-height: 1.4; color: var(--navy); }\n  #qa .bad { color: var(--red); font-weight: 600; }\n  #qa .ok { color: var(--navy-mid); font-weight: 700; }\n  #paste-panel { margin-bottom: 14px; max-width: 1080px; }\n  #paste-panel[hidden] { display: none; }\n  #paste-box { display: block; width: 100%; height: 200px; margin-bottom: 8px; padding: 10px; border: 1px solid var(--steel);\n    border-radius: 0; font: 13px/1.4 ui-monospace, Menlo, Consolas, monospace; }\n  #paste-msg { font-size: 13px; color: var(--navy); margin-left: 12px; }\n  #wrap { position: relative; overflow: hidden; }\n  #stage { position: absolute; top: 0; left: 0; transform-origin: top left; }\n  #export-msg { margin-top: 12px; font-size: 13px; color: var(--navy); }\n  #export-out img { display: block; max-width: 100%; margin-top: 8px; }\n\n  /* ===== THE EXPORTED FRAME. Portrait keeps the bottom 120 px clear for platform overlays. ===== */\n  #evf-frame { --f: 1; width: 1080px; height: 1350px; padding: 80px 80px 120px 80px; background: var(--navy); color: var(--white);\n    display: flex; flex-direction: column; overflow: hidden; }\n  #evf-frame.landscape { --f: 0.75; width: 1280px; height: 720px; padding: 48px 68px 44px 68px; }\n  .evf-top { display: flex; justify-content: space-between; align-items: center; height: calc(48px * var(--f)); flex: none; }\n  .evf-logo { height: calc(48px * var(--f)); width: auto; display: block; }\n  .evf-eyebrow { font-weight: 600; font-size: calc(22px * var(--f)); letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); }\n  .evf-accent { width: calc(56px * var(--f)); height: 4px; background: var(--cyan); margin-top: calc(48px * var(--f)); flex: none; }\n  .landscape .evf-accent { margin-top: 26px; }\n  .evf-headline { font-family: \'Barlow\', \'Aktiv Grotesk Ex\', sans-serif; font-weight: 800; font-size: 68px; line-height: 1.04;\n    letter-spacing: .02em; text-transform: uppercase; margin-top: calc(22px * var(--f)); flex: none; text-wrap: balance; }\n  .evf-subtitle { font-size: calc(28px * var(--f)); line-height: 1.35; color: var(--muted); margin-top: calc(18px * var(--f)); flex: none; }\n  .evf-legend { display: flex; flex-wrap: wrap; gap: calc(14px * var(--f)) calc(34px * var(--f)); margin-top: calc(26px * var(--f));\n    font-size: calc(24px * var(--f)); font-weight: 500; color: var(--muted); flex: none; }\n  .evf-legend:empty { display: none; }\n  .evf-legend i { display: inline-block; width: calc(18px * var(--f)); height: calc(18px * var(--f)); margin-right: 10px; vertical-align: -2px; }\n  .evf-chart { position: relative; flex: 1 1 auto; min-height: 0; margin-top: calc(30px * var(--f)); }\n  .evf-custom { flex: 1 1 auto; min-height: 0; margin-top: calc(36px * var(--f)); display: flex; flex-direction: column; justify-content: center; }\n  .evf-note { font-size: calc(22px * var(--f)); line-height: 1.4; color: var(--faint); margin-top: calc(20px * var(--f)); flex: none; }\n  .evf-note:empty { display: none; }\n  .evf-source { font-size: calc(22px * var(--f)); line-height: 1.4; color: var(--steel); margin-top: 8px; flex: none; }\n\n  /* ===== CLASSES FOR type "custom" ===== */\n  .evf-table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }\n  .evf-table th { font-size: calc(22px * var(--f)); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--steel);\n    text-align: left; padding: 0 calc(18px * var(--f)) calc(16px * var(--f)) calc(18px * var(--f)); }\n  .evf-table td { font-size: calc(28px * var(--f)); padding: calc(18px * var(--f)); border-top: 1px solid rgba(255,255,255,0.08); }\n  .evf-table tbody tr:nth-child(odd) { background: rgba(12,75,118,0.18); }\n  .evf-table .num { text-align: right; }\n  .evf-table .hl, .evf-pos { color: var(--cyan); font-weight: 600; }\n  .evf-neg { color: var(--red); }\n  .evf-stat { font-family: \'Barlow\', sans-serif; font-weight: 800; font-size: calc(150px * var(--f)); line-height: 1; color: var(--cyan); }\n  .evf-stat-label { font-size: calc(30px * var(--f)); line-height: 1.35; color: var(--muted); margin-top: calc(16px * var(--f)); max-width: 820px; }\n  .evf-pair { display: flex; gap: calc(56px * var(--f)); }\n  .evf-pair > div { flex: 1 1 0; min-width: 0; border-top: 4px solid rgba(255,255,255,0.18); padding-top: calc(28px * var(--f)); }\n  .evf-pair > div:last-child { border-top-color: var(--cyan); }\n  .evf-pair .evf-stat { font-size: calc(112px * var(--f)); color: var(--white); }\n  .evf-pair > div:last-child .evf-stat { color: var(--cyan); }\n  .evf-flow { display: flex; align-items: stretch; }\n  .evf-node { flex: 1 1 0; min-width: 0; background: rgba(12,75,118,0.28); border-top: 4px solid var(--cyan);\n    padding: calc(26px * var(--f)) calc(22px * var(--f)); }\n  .evf-node-value { font-family: \'Barlow\', sans-serif; font-weight: 800; font-size: calc(52px * var(--f)); line-height: 1.05; }\n  .evf-node-label { font-size: calc(24px * var(--f)); line-height: 1.35; color: var(--muted); margin-top: 10px; }\n  .evf-arrow { flex: none; align-self: center; font-family: \'Barlow\', sans-serif; font-weight: 700; font-size: calc(44px * var(--f));\n    color: var(--cyan); padding: 0 calc(14px * var(--f)); }\n  .evf-callout { border-left: 4px solid var(--cyan); background: rgba(29,180,215,0.08); padding: calc(20px * var(--f)) calc(28px * var(--f));\n    font-size: calc(28px * var(--f)); line-height: 1.4; margin-top: calc(28px * var(--f)); }\n  .evf-timeline { border-left: 2px solid rgba(255,255,255,0.18); padding-left: calc(32px * var(--f)); display: flex; flex-direction: column;\n    gap: calc(30px * var(--f)); }\n  .evf-when { font-family: \'Barlow\', sans-serif; font-weight: 700; font-size: calc(26px * var(--f)); letter-spacing: .04em;\n    text-transform: uppercase; color: var(--cyan); }\n  .evf-what { font-size: calc(27px * var(--f)); line-height: 1.35; margin-top: 4px; }';
@@ -33,7 +33,7 @@ function fmt(v, dec, bare) {
 }
 function tick(v) { const y = C.yAxis || {}; if (v === 0 && (C.numberFormat || {}).prefix) return '0'; return fmt(v, y.tickDecimals !== undefined ? y.tickDecimals : 0, true); }
 function isPart(i) { return C.partialFrom !== null && C.partialFrom !== undefined && i >= C.partialFrom; }
-function isHi(label) { return (C.highlight || []).includes(label); }
+function isHi(label, i) { return (C.highlight || []).some(h => String(h) === String(label) || (Number.isInteger(h) && h === i)); }
 function role(s) { return LINE[s.role] ? s.role : 'focus'; }
 function merge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k])) { a[k] = merge(a[k] || {}, b[k]); } else { a[k] = b[k]; } } return a; }
 function lastIdx(arr) { for (let i = (arr || []).length - 1; i >= 0; i--) { if (arr[i] !== null && arr[i] !== undefined) return i; } return -1; }
@@ -95,15 +95,15 @@ function build() {
     if (!single) legendHTML(S.map(s => ({ n: s.name, c: FILL[role(s)] })));
     const ds = S.map(s => ({ label: s.name, data: s.data,
       backgroundColor: c => { const v = s.data[c.dataIndex]; const hl = (C.highlight || []).length > 0;
-        if (hl && !isHi(L[c.dataIndex])) return K.steel;
+        if (hl && !isHi(L[c.dataIndex], c.dataIndex)) return K.steel;
         if (single && v < 0) return K.negBar;
         if (single && isPart(c.dataIndex)) return K.partBar;
         if (hl) return K.posBar;
         return FILL[role(s)]; },
       borderColor: c => { const hl = (C.highlight || []).length > 0;
-        return (single && s.data[c.dataIndex] < 0 && (!hl || isHi(L[c.dataIndex]))) ? K.negEdge : 'rgba(0,0,0,0)'; },
+        return (single && s.data[c.dataIndex] < 0 && (!hl || isHi(L[c.dataIndex], c.dataIndex))) ? K.negEdge : 'rgba(0,0,0,0)'; },
       borderWidth: c => { const hl = (C.highlight || []).length > 0;
-        return (single && s.data[c.dataIndex] < 0 && (!hl || isHi(L[c.dataIndex]))) ? 2 : 0; },
+        return (single && s.data[c.dataIndex] < 0 && (!hl || isHi(L[c.dataIndex], c.dataIndex))) ? 2 : 0; },
       categoryPercentage: 0.78, barPercentage: single ? 0.86 : 0.92 }));
     return { type: 'bar', data: { labels: L, datasets: ds },
       options: { indexAxis: hb ? 'y' : 'x',
@@ -119,7 +119,7 @@ function build() {
   if (T === 'scatter') {
     const pts = (S[0] && S[0].data) || [];
     return { type: 'scatter', data: { datasets: [{ label: S[0] ? S[0].name : '', data: pts, pointRadius: px(9), borderWidth: 0,
-      backgroundColor: c => { const p = pts[c.dataIndex]; return (p && isHi(p.label)) ? K.cyan : K.steel; } }] },
+      backgroundColor: c => { const p = pts[c.dataIndex]; return (p && isHi(p.label, c.dataIndex)) ? K.cyan : K.steel; } }] },
       options: { layout: { padding: { right: px(40), top: px(20) } }, scales: {
         x: { type: 'linear', grid: { color: K.grid, drawTicks: false }, border: { color: K.axis }, title: axisTitle(C.xAxis),
              ticks: { padding: px(10), maxTicksLimit: 7 } },
@@ -164,7 +164,7 @@ const evfPlugin = { id: 'evf', afterDatasetsDraw(chart) {
     const slot = hb ? (A.bottom - A.top) / Math.max(1, n) : (A.right - A.left) / Math.max(1, n);
     const fits = hb ? slot >= px(30) : widest + px(10) <= slot;
     const vmax = Math.max(...vals), vmin = Math.min(...vals);
-    const key = i => i === lastIdx(s.data) || isHi(L[i]) || nums[i] === vmax || nums[i] === vmin;
+    const key = i => i === lastIdx(s.data) || isHi(L[i], i) || nums[i] === vmax || nums[i] === vmin;
     let mode = C.valueLabels || 'auto';
     if (mode === 'auto') mode = fits ? 'all' : 'key';
     if (mode === 'all' && !fits) OVERLAP = true;
@@ -174,7 +174,7 @@ const evfPlugin = { id: 'evf', afterDatasetsDraw(chart) {
         else { ctx.strokeRect(bar.x - bar.width / 2, Math.min(bar.y, bar.base), bar.width, Math.abs(bar.base - bar.y)); }
         ctx.setLineDash([]); }
       if (mode === 'none' || (mode === 'last' && i !== lastIdx(s.data)) || (mode === 'key' && !key(i))) return;
-      ctx.font = '700 ' + px(26) + "px 'Barlow'"; ctx.fillStyle = v < 0 ? K.red : (isPart(i) || isHi(L[i]) ? K.cyan : K.white);
+      ctx.font = '700 ' + px(26) + "px 'Barlow'"; ctx.fillStyle = v < 0 ? K.red : (isPart(i) || isHi(L[i], i) ? K.cyan : K.white);
       if (hb) { ctx.textBaseline = 'middle'; ctx.textAlign = v < 0 ? 'right' : 'left'; ctx.fillText(fmt(v), v < 0 ? bar.x - px(12) : bar.x + px(12), bar.y); }
       else { const t = fmt(v); const tw = ctx.measureText(t).width; const x = Math.max(tw / 2 + px(4), Math.min(bar.x, chart.width - tw / 2 - px(4)));
         ctx.textAlign = 'center'; ctx.textBaseline = v < 0 ? 'top' : 'bottom'; ctx.fillText(t, x, v < 0 ? bar.y + px(10) : bar.y - px(10)); }
@@ -183,8 +183,8 @@ const evfPlugin = { id: 'evf', afterDatasetsDraw(chart) {
   if (T === 'scatter') {
     const pts = (S[0] && S[0].data) || []; const meta = chart.getDatasetMeta(0);
     ctx.font = '600 ' + px(22) + "px 'Inter Tight'"; ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
-    meta.data.forEach((el, i) => { const p = pts[i]; if (!p || !p.label) return; if ((C.highlight || []).length && !isHi(p.label)) return;
-      ctx.fillStyle = isHi(p.label) ? K.cyan : K.muted; ctx.fillText(p.label, el.x + px(16), el.y); });
+    meta.data.forEach((el, i) => { const p = pts[i]; if (!p || !p.label) return; if ((C.highlight || []).length && !isHi(p.label, i)) return;
+      ctx.fillStyle = isHi(p.label, i) ? K.cyan : K.muted; ctx.fillText(p.label, el.x + px(16), el.y); });
   }
   ctx.restore();
 } };
@@ -255,6 +255,9 @@ function lint(headOK) {
     const all = [].concat(...S.map(s => (s.data || []).filter(v => typeof v === 'number')));
     if (all.some(v => v < 0) && all.some(v => v > 0)) w.push('Gains and losses need signs. Set numberFormat.signed to true.');
   }
+  const HL = T === 'scatter' ? ((S[0] || {}).data || []).map(p => p && p.label) : L;
+  (C.highlight || []).forEach(h => { if (!HL.some((lab, i) => String(h) === String(lab) || (Number.isInteger(h) && h === i))) w.push('highlight entry ' + JSON.stringify(h) + ' matches no bar or point.'); });
+  if (T !== 'custom' && S.length > 1) { const rs = S.map(role); if (new Set(rs).size < rs.length) w.push('Two series share a colour. Give each series its own role.'); }
   if (OVERLAP) w.push('Value labels overlap. Set valueLabels to "auto" or "last".');
   if ((C.numberFormat || {}).prefix === '$' && /\bSGD\b|S\$|Singapore dollar/i.test(String(C.subtitle || '') + ' ' + String(C.note || ''))) w.push('Values are in Singapore dollars. Use the prefix "S$".');
   if (overflow()) w.push('Content runs past the bottom margin. Shorten the text or remove rows.');
